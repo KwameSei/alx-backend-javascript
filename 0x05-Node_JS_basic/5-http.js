@@ -27,8 +27,10 @@ const countStudents = (doc) => {
         let result = `Number of students: ${count}\n`;
 
         for (const field in fields) {
-          const students = fields[field].join(', ');
-          result += `Number of students in ${field}: ${fields[field].length}. List: ${students}\n`;
+          if (Object.prototype.hasOwnProperty.call(fields, field)) {
+            const students = fields[field].join(', ');
+            result += `Number of students in ${field}: ${fields[field].length}. List: ${students}\n`;
+          }
         }
 
         resolve(result);
