@@ -2,36 +2,37 @@ const fs = require('fs');
 const path = require('path');
 
 const countStudents = (doc) => {
-  const filePath = path.join(__dirname, doc); // __dirname is the directory name of current module
+  const filePath = path.join(__dirname, doc);
 
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf8', (err, data) => { // readFileSync is a synchronous version of readFile
+    fs.readFile(filePath, 'utf8', (err, data) => {
       if (err) {
         reject(new Error('Cannot load the database'));
       } else {
-        const lines = data.split('\n').slice(1, data.length - 1); // split the data into lines
-        let count = 0; // count the number of lines
-        const fields = {}; // create an object to store the fields
+        const lines = data.split('\n').slice(1, data.length - 1);
+        let count = 0;
+        const fields = {};
 
-        for (const i of lines) { // iterate through the lines
-          if (i) { // if the line is not empty
-            const [student, , , field] = i.trim().split(','); // split the line into columns
-            if (!fields[field]) { // if the field is not yet in the fields object
-              fields[field] = []; // add the field to the fields object
-            }
-            fields[field].push(student); // add the student to the field
-            count += 1; // increment the number of lines
+        for (const line of lines) {
+          const [student, , , field] = line.trim().split(',');
+
+          if (!fields[field]) {
+            fields[field] = [];
+          }
+          fields[field].push(student);
+          count += 1;
+        }
+
+        let result = `Number of students: ${count}\n`;
+
+        for (const field in fields) {
+          if (Object.prototype.hasOwnProperty.call(fields, field)) {
+            const students = fields[field].join(', ');
+            result += `Number of students in ${field}: ${fields[field].length}. List: ${students}\n`;
           }
         }
 
-        console.log(`Number of students: ${count}`); // print the number of lines
-        for (const field in fields) { // iterate through the fields
-          if (field) {
-            console.log(`Number of students in ${field}: ${fields[field].length}. List: ${fields[field].join(', ')}`);
-          }
-        }
-
-        resolve();
+        resolve(result);
       }
     });
   });
